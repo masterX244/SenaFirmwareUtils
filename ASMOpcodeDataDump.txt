@@ -1,0 +1,498 @@
+
+##   x0     x1      x2      x3      x4      x5      x6      x7      
+0x  NOP                                     
+1x  ld      ld      ld      ld      ld      ld      ld      ld
+2x  bgt     st      st      st      ??      st      st      st
+3x  add     add     add     add     add     add     add     add
+4x
+5x  sub     sub     sub     sub     sub     sub     sub     sub
+6x
+7x
+8x  cmp     cmp     cmp     cmp     cmp     cmp     cmp     cmp
+9x  xmult   xmult   xmult   xmult   xdiv    xdiv    xdiv    xdiv       
+ax  asl;lsl asl;lsl asl;lsl asl;lsl lsr;asr lsr;asr lsr;asr lsr;asr
+bx  or      or      or      or      or      or      or      or
+cx  and     and     and     and     and     and     and     and    
+dx  xor     xor     xor     xor     xor     xor     xor     xor
+ex          BRA     BRA;RTS BRA             blt     blt     blt
+fx          bne     bne     bne             beq     beq     beq
+
+##   x8     x9      xa      xb      xc      xd      xe      xf      
+0x          MDFY    st xh   enterl                  ld xh   leavel
+1x  ld      ld      ld      ld      ld      ld      ld      ld
+2x  ??      st      st      st      bcz     st      st      st
+3x  add     add     add     add     add     add     add     add
+4x
+5x  sub     sub     sub     sub     sub     sub     sub     sub
+6x
+7x
+8x  cmp     cmp     cmp     cmp     cmp     cmp     cmp     cmp
+9x          tst     tst     tst             bsr     bsr     bsr
+ax
+bx  or      or      or      or      or      or      or      or
+cx  and     and     and     and     and     and     and     and  
+dx  xor     xor     xor     xor     xor     xor     xor     xor
+ex
+fx          bcc     bcc     bcc             bcs     bcs     bcs
+
+
+
+nop, ld, st, 
+
+add, sub, umult, smult, sdiv, udiv
+
+lsr lsl
+
+asr asl
+
+bra, beq,bne, bcs,bcc,bcz  blt bgt
+
+cmp tst
+and, or, xor
+
+
+enterl //begin routine
+leavel //end routine
+
+bsr,   rts
+
+
+
+
+CHECK: bcs bgt 
+Kollision mit st
+
+0 , C belegt. beides sind ungültige immediate-modes für store
+
+asm opcodes:
+
+nop: 0x0000
+
+Zusatzbytes für Opcode: "parameterisiertes NOP"
+
+0x??0X = specialcase-opcodes
+
+0009 Modifier für nächsten opcode
+0e load xh 
+0a st xh
+0xb enterl
+Struktur: 
+0009 präfix(optional)
+fe09: brxl: branch for switchtable, muss dazu data dereferenzieren
+xx00 Zusatzbyte (optional)
+xx00 Zusatzbyte (optional), für große parameter
+xxYY Opcode
+
+xx der integerparameter
+
+ld:
+
+Load Value into Register
+ld AL #CONSTANT: xx14 (0-127)
+
+Values itieriert von -32768-32767 in file.
+
+ld suffixes: AL 14, AH 10, X 18, Y 1C
+
+
+
+LSB Or-In
+0x03: (????, Y) Load from Address, (offset based on register Y?)
+0x02: (????, X) Load from Address, (offset based on register X?)
+0x01: (????): Load From Address, absolute
+0x00: Immediate
+
+
+
+LD specialcases:
+ld xh, @(1,y) = xx0e, Regel rausfinden, Riect nach dem MSByte für die bra-adresse
+
+st:
+Selbe Logik wie für ld bei Multibyte-Opcodes
+
+Store Register on Address
+
+st x, @address xx29
+st y, @address xx2d
+st al, @address xx25
+st ah, @address xx21
+
+
+LSB Or-In
+0x03: (????, Y) Load from Address, (offset based on register Y?)
+0x02: (????, X) Load from Address, (offset based on register X?)
+0x01: (????): Load From Address, absolute
+0x00: Ungültig, Immediate gilt hier nicht
+
+
+ST specialcases: 
+st xh, @(1,y) = xx0a
+
+ADD: 
+    ADD AH #XX
+        xx30
+    ADD AH @x
+        xx31
+    ADD AH @(xx,X)
+        xx32
+    ADD AH @(xx,y)
+        xx33
+
+    ADD AL #XX
+        xx34
+    ADD AL @x
+        xx35
+    ADD AL @(xx,X)
+        xx36
+    ADD AL @(xx,y)
+        xx37
+        
+    ADD X #XX
+        xx38
+    ADD X @x
+        xx39
+    ADD X @(xx,X)
+        xx3a
+    ADD X @(xx,y)
+        xx3b
+        
+    ADD Y #XX
+        xx3c
+    ADD Y @x
+        xx3d
+    ADD Y @(xx,X)
+        xx3e
+    ADD Y @(xx,y)
+        xx3f
+
+
+sub: 
+    sub AH #XX
+        xx50
+    sub AH @x
+        xx51
+    sub AH @(xx,X)
+        xx52
+    sub AH @(xx,y)
+        xx53
+
+    sub AL #XX
+        xx54
+    sub AL @x
+        xx55
+    sub AL @(xx,X)
+        xx56
+    sub AL @(xx,y)
+        xx57
+        
+    sub X #XX
+        xx58
+    sub X @x
+        xx59
+    sub X @(xx,X)
+        xx5a
+    sub X @(xx,y)
+        xx5b
+        
+    sub Y #XX
+        xx5c
+    sub Y @x
+        xx5d
+    sub Y @(xx,X)
+        xx5e
+    sub Y @(xx,y)
+        xx5f
+umult:
+smult:
+
+umult 0009 (Extensionbyte immer nötig für 09-flag)
+smult
+      xx90
+    xmult #XX
+        xx90
+    xmult @x
+        xx91
+    xmult @(xx,X)
+        xx92
+    xmult @(xx,y)
+        xx93
+udiv:
+0009 modifier
+sdiv:
+    xdiv #XX
+        xx94
+    xdiv @x
+        xx95
+    xdiv @(xx,X)
+        xx96
+    xdiv @(xx,y)
+        xx97
+    
+    
+LSR:
+0009 Modifier
+ASR:
+    ASR #XX
+        xxA4
+    ASR @x
+        xxA5
+    ASR @(xx,X)
+        xxA6
+    ASR @(xx,y)
+        xxA7
+ASL:
+LSL:
+    ASL #XX
+        xxA0
+    ASL @x
+        xxA1
+    ASL @(xx,X)
+        xxA2
+    ASL @(xx,y)
+        xxA3
+
+
+ASL: == LSL, verhalten sich identisch
+    
+
+
+
+bra:
+bra @x
+xxe1
+-128=0x80 
+-1  = xff
++127=7f
+
+bra @(x,Y)
+xxe3
+-128=0x80 
+-1  = xff
++127=7f
+bra @(x,X)
+xxe2
+-128=0x80 
+-1  = xff
++127=7f
+
+
+bsr: 
+    bsr: @(x,Y)
+        xx9f
+    bsr @(x,X)
+        xx9e
+    bsr @XX
+        xx9d
+
+
+beq: 
+    beq: @(x,Y)
+        xxf7
+    beq @(x,X)
+        xxf6
+    beq @XX
+        xxf5
+bne: 
+    bne: @(x,Y)
+        xxf3
+    bne @(x,X)
+        xxf2
+    bne @XX
+        xxf1
+bcs:
+    bcs: @(x,Y)
+        xxff
+    bcs @(x,X)
+        xxfe
+    bcs @XX
+        xxfd
+bcc:
+    bcc: @(x,Y)
+        xxfb
+    bcc @(x,X)
+        xxfa
+    bcc @XX
+        xxf9
+bcz:
+    bcz @XX
+        xx2c
+        kann nur direkt adressieren
+bgt:
+    bgt @XX
+        xx20
+        kann nur direkt adressieren
+        
+        
+blt:
+    blt @XX
+        xxe5
+    blt @(xx,x)
+        xxe6
+    blt @(xx,Y)
+        xxe7
+--------------------------------------
+        
+cmp:
+    cmp AL #XX
+        xx84
+    cmp AL @x
+        xx85
+    cmp AL @(xx,X)
+        xx86
+    cmp AL @(xx,y)
+        xx87
+        
+    cmp AH #XX
+        xx80
+    cmp AH @x
+        xx81
+    cmp AH @(xx,X)
+        xx82
+    cmp AH @(xx,y)
+        xx83
+        
+    cmp X #XX
+        xx88
+    cmp X @x
+        xx89
+    cmp X @(xx,X)
+        xx8a
+    cmp X @(xx,y)
+        xx8b
+        
+    cmp Y #XX
+        xx8c
+    cmp Y @x
+        xx8d
+    cmp Y @(xx,X)
+        xx8e
+    cmp Y @(xx,y)
+        xx8f
+tst
+    tst @XX
+        xx99
+    tst @(1,x)
+        xx9a
+    tst @(1,y)
+        xx9b
+and:
+    and AH #x
+        xxc0
+    and AH @x:
+        xxc1
+    and AH @(x,X):
+        xxc2
+    and AH @(x,Y):
+        xxc3
+
+    and AL #x
+        xxc4
+    and AL @x:
+        xxc5
+    and AL @(x,X):
+        xxc6
+    and AL @(x,Y):
+        xxc7
+
+    and X #x
+        xxc8
+    and X @x:
+        xxc9
+    and X @(x,X):
+        xxca
+    and X @(x,Y):
+        xxcb
+        
+    and AL #x
+        xxcc
+    and AL @x:
+        xxcd
+    and AL @(x,X):
+        xxce
+    and AL @(x,Y):
+        xxcf
+
+OR:
+    OR AH #x
+        xxb0
+    OR AH @x:
+        xxb1
+    OR AH @(x,X):
+        xxb2
+    OR AH @(x,Y):
+        xxb3
+
+    OR AL #x
+        xxb4
+    OR AL @x:
+        xxb5
+    OR AL @(x,X):
+        xxb6
+    OR AL @(x,Y):
+        xxb7
+
+    OR X #x
+        xxb8
+    OR X @x:
+        xxb9
+    OR X @(x,X):
+        xxba
+    OR X @(x,Y):
+        xxbb
+        
+    OR AL #x
+        xxbc
+    OR AL @x:
+        xxbd
+    OR AL @(x,X):
+        xxbe
+    OR AL @(x,Y):
+        xxbf
+
+
+XOR:
+    XOR AH #x
+        xxd0
+    XOR AH @x:
+        xxd1
+    XOR AH @(x,X):
+        xxd2
+    XOR AH @(x,Y):
+        xxd3
+
+    XOR AL #x
+        xxd4
+    XOR AL @x:
+        xxd5
+    XOR AL @(x,X):
+        xxd6
+    XOR AL @(x,Y):
+        xxd7
+
+    XOR X #x
+        xxd8
+    XOR X @x:
+        xxd9
+    XOR X @(x,X):
+        xxda
+    XOR X @(x,Y):
+        xxdb
+        
+    XOR AL #x
+        xxdc
+    XOR AL @x:
+        xxdd
+    XOR AL @(x,X):
+        xxde
+    XOR AL @(x,Y):
+        xxdf
+
+enterl: begin routine
+    xx0b
+    parametercode anders!!!, tabelle bruteforcen...
+leavel: end routine
+    xx0f
+    parameter gleich wie enterl
+rts
+    00e2
+    ???? bra. == bra @(0,x)

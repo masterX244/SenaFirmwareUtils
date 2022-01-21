@@ -1,0 +1,29 @@
+defaultTasks 'distZip'
+
+apply plugin: 'java'
+apply plugin: 'application'
+
+
+sourceCompatibility = 1.11
+version = 'SNAPSHOT'
+mainClassName = 'de.nplusc.izc.senabitwiggler.EntryPoint'
+
+
+jar{
+	manifest{
+		attributes 'Implementation-Title': 'senabitwiggler',
+					'Implementation-Version': 'SNAPSHOT',
+					'Main-Class': 'de.nplusc.izc.senabitwiggler.EntryPoint'
+					
+	}
+}
+
+repositories{
+	mavenCentral()
+}
+
+dependencies{
+    compile "org.yaml:snakeyaml:1.14"
+    compile("com.google.guava:guava:31.0.1-jre")
+	compile( 'info.picocli:picocli:4.6.2')
+}
