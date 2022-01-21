@@ -1,4 +1,4 @@
-#Sena Firmware Modding Tools
+# Sena Firmware Modding Tools
 Supported: 
  * Splitting the Sena IMG files into modules (WOrks on any file that uses the long header format)
  * Disassembling Prompts into editable wave files. Requires SOX and the ADK for CSR chips installed and configured
