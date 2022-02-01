@@ -8,9 +8,10 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
+@Command(mixinStandardHelpOptions = true, version = "Sena Firmware Hacking Utiility")
 public class EntryPoint implements Runnable
 {
-    @Parameters(index = "0", description = "The file whose checksum to calculate.")
+    @Parameters(index = "0", description = "Mode for the Program. Valid values: ${COMPLETION-CANDIDATES}")
     private Modes mode;
 
 
@@ -70,25 +71,6 @@ public class EntryPoint implements Runnable
         cl.execute(args);
     }
 
-
-
-
-
-    private static void printUsage()
-    {
-        System.out.println("Usage:");
-        System.out.println("program MODE VARIANT FILE FOLDER");
-        System.out.println("DIRECTION: extract, import, extractVM, importVM");
-        System.out.println("extract: Extracts a Sena Firmware image");
-        System.out.println("Import: Imports a Sena Firmware Image");
-        System.out.println("extractvm Extracts a BlueCore exe-file");
-        System.out.println("importvm Reglues a BlueCore exe-file");
-        System.out.println("Variant: short OR long");
-        System.out.println("only long supported so far. short header needs more information");
-
-    }
-
-
     @Override
     public void run() {
         //TODO check and init config file
@@ -129,6 +111,15 @@ public class EntryPoint implements Runnable
                     e.printStackTrace();
                 }
                 break;
+            case Jailbreak:
+                Jailbreaker.jailbreak();
+                break;
+            case DumpFlashes:
+                Jailbreaker.dumpFlash(input.getName(),output);
+                break;
+            case ResignDFU:
+                Jailbreaker.resignDFU(input.getPath(),output);
+                break;
         }
     }
 }
@@ -141,7 +132,10 @@ enum Modes
     ImportVMImage,
     DisassembleXAP,
     ExtractForPrompts,
-    ReassembleForPrompts
+    ReassembleForPrompts,
+    Jailbreak,
+    DumpFlashes,
+    ResignDFU
 }
 
 // http://www.tinyosshop.com/download/ADK_CSR867x.WIN4.3.1.5.zip für die tools

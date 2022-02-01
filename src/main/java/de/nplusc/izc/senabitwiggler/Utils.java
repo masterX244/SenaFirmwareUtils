@@ -53,6 +53,28 @@ public class Utils {
         return xorsum;
     }
 
+    public static void runTool(String... args) throws IOException {
+
+        runTool(null,args);
+    }
+
+
+
+    public static void runTool(File workdir, String... args) throws IOException {
+        ProcessBuilder pb = new ProcessBuilder();
+        pb.command(args);
+        if(workdir !=null&&workdir.isDirectory())
+        {
+            pb.directory(workdir);
+        }
+        pb.inheritIO();
+        Process runme = pb.start();
+        try {
+            runme.waitFor();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
 
 }

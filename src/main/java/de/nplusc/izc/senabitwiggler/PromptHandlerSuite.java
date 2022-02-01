@@ -11,6 +11,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
+//lazy compat hack after refactor
+import static de.nplusc.izc.senabitwiggler.Utils.runTool;
+
 public class PromptHandlerSuite {
     public static void handlePrompts(File firmware, File outfolder, String headsetid,boolean deep) throws InputInvalidException {
         URL rsrc = EntryPoint.class.getResource("/PromptConfigs/"+headsetid+".prompts.yml");
@@ -234,26 +237,5 @@ public class PromptHandlerSuite {
     }
 
 
-    private static void runTool(String... args) throws IOException {
 
-        runTool(null,args);
-    }
-
-
-
-    private static void runTool(File workdir, String... args) throws IOException {
-        ProcessBuilder pb = new ProcessBuilder();
-        pb.command(args);
-        if(workdir !=null&&workdir.isDirectory())
-        {
-            pb.directory(workdir);
-        }
-        pb.inheritIO();
-        Process runme = pb.start();
-        try {
-            runme.waitFor();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 }
