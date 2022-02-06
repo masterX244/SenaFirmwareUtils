@@ -1,0 +1,3 @@
+file: "vp.bin"
+ALL: "PCM"
+maincpu: "Sena_50S_BT.dfu"

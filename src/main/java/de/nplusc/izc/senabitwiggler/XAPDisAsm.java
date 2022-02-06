@@ -32,7 +32,9 @@ public class XAPDisAsm {
         {
             badOpCode += (Utils.bytesToHex(Shorts.toByteArray(opcode[i])));
         }
-        return OpcodeAddressRangeToString(address,opcode.length+(modified?1:0))+":Invalid OpCode: "+badOpCode;
+        String invalidCode = OpcodeAddressRangeToString(address,opcode.length+(modified?1:0))+":Invalid OpCode: "+badOpCode;
+        System.err.println(invalidCode);
+        return invalidCode;
     };
     public static OpCodeMangler[] manglers = new OpCodeMangler[256];
         static {
@@ -227,7 +229,10 @@ public class XAPDisAsm {
             };
 
             OpCodeMangler add = GetBasicMangler("add",(short)0x30);
+            OpCodeMangler nadd = GetBasicMangler("nadd",(short)0x70);
+            OpCodeMangler addc = GetBasicMangler("addc",(short)0x40);
             OpCodeMangler sub = GetBasicMangler("sub",(short)0x50);
+            OpCodeMangler subc = GetBasicMangler("sub",(short)0x60);
             OpCodeMangler or = GetBasicMangler("or",(short)0xb0);
             OpCodeMangler and = GetBasicMangler("and",(short)0xc0);
             OpCodeMangler xor = GetBasicMangler("xor",(short)0xd0);
@@ -304,8 +309,24 @@ public class XAPDisAsm {
                         label="bgt";
                         value = ParamManglerAddress(valueSigned);
                         break;
+                    case 0x24:
+                        label="bge";
+                        value = ParamManglerAddress(valueSigned);
+                        break;
+                    case 0x28:
+                        label="blt";
+                        value = ParamManglerAddress(valueSigned);
+                        break;
                     case 0x2c:
                         label="bcz";
+                        value = ParamManglerAddress(valueSigned);
+                        break;
+                    case 0xe8:
+                        label="bpl";
+                        value = ParamManglerAddress(valueSigned);
+                        break;
+                    case 0xec:
+                        label="bmi";
                         value = ParamManglerAddress(valueSigned);
                         break;
                 }
@@ -365,11 +386,11 @@ public class XAPDisAsm {
             manglers[0x21]=st;
             manglers[0x22]=st;
             manglers[0x23]=st;
-            manglers[0x24]=invalid;
+            manglers[0x24]=bxx;//bge
             manglers[0x25]=st;
             manglers[0x26]=st;
             manglers[0x27]=st;
-            manglers[0x28]=invalid;
+            manglers[0x28]=bxx; //ble
             manglers[0x29]=st;
             manglers[0x2a]=st;
             manglers[0x2b]=st;
@@ -396,22 +417,22 @@ public class XAPDisAsm {
             manglers[0x3e]=add;
             manglers[0x3f]=add;
 
-            manglers[0x40]=invalid;
-            manglers[0x41]=invalid;
-            manglers[0x42]=invalid;
-            manglers[0x43]=invalid;
-            manglers[0x44]=invalid;
-            manglers[0x45]=invalid;
-            manglers[0x46]=invalid;
-            manglers[0x47]=invalid;
-            manglers[0x48]=invalid;
-            manglers[0x49]=invalid;
-            manglers[0x4a]=invalid;
-            manglers[0x4b]=invalid;
-            manglers[0x4c]=invalid;
-            manglers[0x4d]=invalid;
-            manglers[0x4e]=invalid;
-            manglers[0x4f]=invalid;
+            manglers[0x40]=addc;
+            manglers[0x41]=addc;
+            manglers[0x42]=addc;
+            manglers[0x43]=addc;
+            manglers[0x44]=addc;
+            manglers[0x45]=addc;
+            manglers[0x46]=addc;
+            manglers[0x47]=addc;
+            manglers[0x48]=addc;
+            manglers[0x49]=addc;
+            manglers[0x4a]=addc;
+            manglers[0x4b]=addc;
+            manglers[0x4c]=addc;
+            manglers[0x4d]=addc;
+            manglers[0x4e]=addc;
+            manglers[0x4f]=addc;
 
 
 
@@ -432,39 +453,39 @@ public class XAPDisAsm {
             manglers[0x5e]=sub;
             manglers[0x5f]=sub;
 
-            manglers[0x60]=invalid;
-            manglers[0x61]=invalid;
-            manglers[0x62]=invalid;
-            manglers[0x63]=invalid;
-            manglers[0x64]=invalid;
-            manglers[0x65]=invalid;
-            manglers[0x66]=invalid;
-            manglers[0x67]=invalid;
-            manglers[0x68]=invalid;
-            manglers[0x69]=invalid;
-            manglers[0x6a]=invalid;
-            manglers[0x6b]=invalid;
-            manglers[0x6c]=invalid;
-            manglers[0x6d]=invalid;
-            manglers[0x6e]=invalid;
-            manglers[0x6f]=invalid;
+            manglers[0x60]=subc;
+            manglers[0x61]=subc;
+            manglers[0x62]=subc;
+            manglers[0x63]=subc;
+            manglers[0x64]=subc;
+            manglers[0x65]=subc;
+            manglers[0x66]=subc;
+            manglers[0x67]=subc;
+            manglers[0x68]=subc;
+            manglers[0x69]=subc;
+            manglers[0x6a]=subc;
+            manglers[0x6b]=subc;
+            manglers[0x6c]=subc;
+            manglers[0x6d]=subc;
+            manglers[0x6e]=subc;
+            manglers[0x6f]=subc;
 
-            manglers[0x70]=invalid;
-            manglers[0x71]=invalid;
-            manglers[0x72]=invalid;
-            manglers[0x73]=invalid;
-            manglers[0x74]=invalid;
-            manglers[0x75]=invalid;
-            manglers[0x76]=invalid;
-            manglers[0x77]=invalid;
-            manglers[0x78]=invalid;
-            manglers[0x79]=invalid;
-            manglers[0x7a]=invalid;
-            manglers[0x7b]=invalid;
-            manglers[0x7c]=invalid;
-            manglers[0x7d]=invalid;
-            manglers[0x7e]=invalid;
-            manglers[0x7f]=invalid;
+            manglers[0x70]=nadd;
+            manglers[0x71]=nadd;
+            manglers[0x72]=nadd;
+            manglers[0x73]=nadd;
+            manglers[0x74]=nadd;
+            manglers[0x75]=nadd;
+            manglers[0x76]=nadd;
+            manglers[0x77]=nadd;
+            manglers[0x78]=nadd;
+            manglers[0x79]=nadd;
+            manglers[0x7a]=nadd;
+            manglers[0x7b]=nadd;
+            manglers[0x7c]=nadd;
+            manglers[0x7d]=nadd;
+            manglers[0x7e]=nadd;
+            manglers[0x7f]=nadd;
 
             manglers[0x80]=cmp;
             manglers[0x81]=cmp;
@@ -491,7 +512,7 @@ public class XAPDisAsm {
             manglers[0x95]=xdiv;
             manglers[0x96]=xdiv;
             manglers[0x97]=xdiv;
-            manglers[0x98]=invalid;
+            manglers[0x98]=tst;
             manglers[0x99]=tst;
             manglers[0x9a]=tst;
             manglers[0x9b]=tst;
@@ -583,11 +604,11 @@ public class XAPDisAsm {
             manglers[0xe5]=blt;
             manglers[0xe6]=blt;
             manglers[0xe7]=blt;
-            manglers[0xe8]=invalid;
+            manglers[0xe8]=bxx; // bpl
             manglers[0xe9]=invalid;
             manglers[0xea]=invalid;
             manglers[0xeb]=invalid;
-            manglers[0xec]=invalid;
+            manglers[0xec]=bxx; //bmi
             manglers[0xed]=invalid;
             manglers[0xee]=invalid;
             manglers[0xef]=invalid;
