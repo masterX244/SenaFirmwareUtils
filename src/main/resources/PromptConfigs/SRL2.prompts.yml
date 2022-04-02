@@ -1,3 +1,0 @@
-ALL: "PCM"
-file: "vp.bin"
-maincpu: "SRL2_M0.img"

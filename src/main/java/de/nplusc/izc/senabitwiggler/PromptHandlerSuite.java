@@ -16,26 +16,18 @@ import static de.nplusc.izc.senabitwiggler.Utils.runTool;
 
 public class PromptHandlerSuite {
     public static void handlePrompts(File firmware, File outfolder, String headsetid,boolean deep) throws InputInvalidException {
-        URL rsrc = EntryPoint.class.getResource("/PromptConfigs/"+headsetid+".prompts.yml");
-        if(rsrc==null)
+        String devicefile = EntryPoint.APPDIR+File.separator+"devices"+File.separator+headsetid+".device.yml";
+        if(!(new File(devicefile).exists()))
         {
-            URL url = EntryPoint.class.getResource("/PromptConfigs/");
-            // HAXX
-            EntryPoint.class.getResourceAsStream("/PromptConfigs/");
-            Path path = null;
-            try {
-                path = Paths.get(url.toURI());
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-            }
+            File f =  new File(EntryPoint.APPDIR+File.separator+"devices");
             System.out.println("Invalid Headset reference: Valid values are");
             try {
-                Files.walk(path, 1).forEach(p ->
+                Files.walk(f.toPath(), 1).forEach(p ->
                 {
                     String fn = p.getFileName().toString();
-                    if(fn.endsWith(".prompts.yml"))
+                    if(fn.endsWith(".device.yml"))
                     {
-                        System.out.println(fn.replace(".prompts.yml",""));
+                        System.out.println(fn.replace(".device.yml",""));
                     }
                 });
             } catch (IOException e) {
@@ -63,8 +55,8 @@ public class PromptHandlerSuite {
 
 
 
-        try (InputStream in = EntryPoint.class.getResourceAsStream("/PromptConfigs/"+headsetid+".prompts.yml");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(devicefile)))
+        {
             HashMap<String,String> config = (HashMap<String, String>) new Yaml().load(reader);
             String file = config.get("file");
             File xuvin = new File(SenaUnwrap,file);
@@ -114,7 +106,7 @@ public class PromptHandlerSuite {
                         throw new InputInvalidException();
                 }
                 List<String> cmd = new ArrayList<>();
-                cmd.add("sox");
+                cmd.add(EntryPoint.SoxPath);
                 cmd.addAll(soxIn);
                 cmd.add(f.getPath());
                 cmd.add("-e");
@@ -137,24 +129,18 @@ public class PromptHandlerSuite {
 
     public static void assembleWithNewPrompts(File firmware, File outfolder, String headsetid) throws InputInvalidException {
         {
-            URL rsrc = EntryPoint.class.getResource("/PromptConfigs/" + headsetid + ".prompts.yml");
-            if (rsrc == null) {
-                URL url = EntryPoint.class.getResource("/PromptConfigs/");
-                // HAXX
-                EntryPoint.class.getResourceAsStream("/PromptConfigs/");
-                Path path = null;
-                try {
-                    path = Paths.get(url.toURI());
-                } catch (URISyntaxException e) {
-                    e.printStackTrace();
-                }
+            String devicefile = EntryPoint.APPDIR+File.separator+"devices"+File.separator+headsetid+".device.yml";
+            if(!(new File(devicefile).exists()))
+            {
+                File f =  new File(EntryPoint.APPDIR+File.separator+"devices");
                 System.out.println("Invalid Headset reference: Valid values are");
                 try {
-                    Files.walk(path, 1).forEach(p ->
+                    Files.walk(f.toPath(), 1).forEach(p ->
                     {
                         String fn = p.getFileName().toString();
-                        if (fn.endsWith(".prompts.yml")) {
-                            System.out.println(fn.replace(".prompts.yml", ""));
+                        if(fn.endsWith(".device.yml"))
+                        {
+                            System.out.println(fn.replace(".device.yml",""));
                         }
                     });
                 } catch (IOException e) {
@@ -179,8 +165,8 @@ public class PromptHandlerSuite {
 
 
 
-            try (InputStream in = EntryPoint.class.getResourceAsStream("/PromptConfigs/"+headsetid+".prompts.yml");
-                BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
+            try (
+                BufferedReader reader = new BufferedReader(new FileReader(devicefile))) {
                 HashMap<String,String> config = (HashMap<String, String>) new Yaml().load(reader);
                 String file = config.get("file");
                 File xuvin = new File(SenaUnwrap,file);
@@ -210,7 +196,7 @@ public class PromptHandlerSuite {
                             throw new InputInvalidException();
                     }
                     List<String> cmd = new ArrayList<>();
-                    cmd.add("sox");
+                    cmd.add(EntryPoint.SoxPath);
                     cmd.add(new File(prompts,fn+".wav").getPath());
                     cmd.addAll(soxIn);
                     cmd.add(f.getPath());

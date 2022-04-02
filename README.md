@@ -8,3 +8,6 @@ Supported:
  * Flash dump of the Headset via SPI. Requires ADK
  * Jailbreaking Sena Headsets to accept selfsigned DFU files. Requries ADK
  * Resignign DFU Files. Requires ADK
+ * Parsing of CSR generation FlashFS and for the QCC51xx version of that FlashFS
+
+Uses JAVA17 features

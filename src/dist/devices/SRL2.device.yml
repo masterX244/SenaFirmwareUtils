@@ -1,0 +1,5 @@
+ALL: "PCM"
+file: "vp.bin"
+maincpu: "SRL2_M0.img"
+auxcpu: "SRL2_M1.img"
+manufacturer: "Sena"

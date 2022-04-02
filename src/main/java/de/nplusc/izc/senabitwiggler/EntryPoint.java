@@ -120,6 +120,15 @@ public class EntryPoint implements Runnable
             case ResignDFU:
                 Jailbreaker.resignDFU(input.getPath(),output);
                 break;
+            case FlashFS512x:
+                FlashFSUnWiggler.unpackFSQCC512x(input,output);
+                break;
+            case FlashFSCSR86xx:
+                FlashFSUnWiggler.unpackCSRFS(input,output);
+                break;
+            case DfuS512x:
+                FlashFSUnWiggler.unpackQCC512DFU(input,output);
+                break;
         }
     }
 }
@@ -135,7 +144,10 @@ enum Modes
     ReassembleForPrompts,
     Jailbreak,
     DumpFlashes,
-    ResignDFU
+    ResignDFU,
+    FlashFS512x,
+    FlashFSCSR86xx,
+    DfuS512x
 }
 
 // http://www.tinyosshop.com/download/ADK_CSR867x.WIN4.3.1.5.zip für die tools

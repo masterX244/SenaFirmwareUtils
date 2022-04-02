@@ -116,10 +116,11 @@ public class FirmwareWrapperExtraction {
             f.read(magic);
 
             hdr.setMagicShit(Longs.fromBytes(filler,filler,filler,filler,magic[3],magic[2],magic[1],magic[0]));
+            // magic[] = {0x19,0x28,0xc5,0xe6}
 
             byte[] unknown_id = new byte[4];
 
-            f.read(unknown_id);
+            f.read(unknown_id); //product id
 
             hdr.setRandom_id(Longs.fromBytes(filler,filler,filler,filler,unknown_id[3],unknown_id[2],unknown_id[1],unknown_id[0]));
 
