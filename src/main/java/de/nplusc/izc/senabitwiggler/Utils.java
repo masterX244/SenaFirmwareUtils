@@ -1,6 +1,8 @@
 package de.nplusc.izc.senabitwiggler;
 
 import com.google.common.primitives.Longs;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.io.File;
@@ -10,6 +12,7 @@ import java.util.Arrays;
 import java.util.Locale;
 
 public class Utils {
+    private static final Logger l = LogManager.getLogger();
     public static byte[] LongToRawBytes(long l)
     {
         byte[] tmp = Longs.toByteArray(l);
@@ -37,7 +40,7 @@ public class Utils {
         {
             if(!od.mkdirs())
             {
-                System.err.println("WTF! somethint ate shit");
+                l.error("WTF! somethint ate shit");
                 return;
             }
         }

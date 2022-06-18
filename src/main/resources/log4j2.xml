@@ -10,7 +10,7 @@
         </Console>
         
         
-        <RollingFile name="logfile" fileName="izpl.log" filePattern="izpl-%i.log">
+        <RollingFile name="logfile" fileName="senabitwiggler.log" filePattern="senabitwiggler-%i.log">
         <Policies>
             <OnStartupTriggeringPolicy />
             </Policies>
@@ -18,7 +18,7 @@
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %l - %msg%n"/>
         </RollingFile>   
 
-        <RollingFile name="logfileExternal" fileName="izpl.log" filePattern="izpl-%i.log">
+        <RollingFile name="logfileExternal" fileName="senabitwiggler.log" filePattern="senabitwiggler-%i.log">
         <Policies>
             <OnStartupTriggeringPolicy />
             </Policies>

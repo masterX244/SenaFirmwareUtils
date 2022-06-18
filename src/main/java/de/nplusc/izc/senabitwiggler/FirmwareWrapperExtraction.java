@@ -2,6 +2,8 @@ package de.nplusc.izc.senabitwiggler;
 
 import com.google.common.base.Charsets;
 import com.google.common.primitives.Longs;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
@@ -9,6 +11,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class FirmwareWrapperExtraction {
+    private static final Logger l = LogManager.getLogger();
     public static void assembleFirmware(File output, String inputfolder)
     {
         Yaml y = new Yaml();

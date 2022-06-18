@@ -1,10 +1,14 @@
 package de.nplusc.izc.senabitwiggler;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.File;
 import java.io.IOException;
 
 public class Jailbreaker {
 
+    private static final Logger l = LogManager.getLogger();
     private static String nvscmd = EntryPoint.BlueLabPath+"nvscmd";
     private static String pscli = EntryPoint.BlueLabPath+"pscli";
 

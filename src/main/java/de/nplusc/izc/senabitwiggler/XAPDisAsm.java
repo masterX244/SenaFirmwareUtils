@@ -2,6 +2,8 @@ package de.nplusc.izc.senabitwiggler;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Shorts;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -14,7 +16,7 @@ interface OpCodeMangler
 }
 
 public class XAPDisAsm {
-
+    private static final Logger l = LogManager.getLogger();
     private static HashMap<String,String> labels = new HashMap<>();
 
     private static OpCodeMangler brxl = (modifier,opcode,address)->{
@@ -33,7 +35,7 @@ public class XAPDisAsm {
             badOpCode += (Utils.bytesToHex(Shorts.toByteArray(opcode[i])));
         }
         String invalidCode = OpcodeAddressRangeToString(address,opcode.length+(modified?1:0))+":Invalid OpCode: "+badOpCode;
-        System.err.println(invalidCode);
+        l.info(invalidCode);
         return invalidCode;
     };
     public static OpCodeMangler[] manglers = new OpCodeMangler[256];
@@ -51,12 +53,12 @@ public class XAPDisAsm {
                 for(int i=0;i<opcode.length;i++)
                 {
                     byte[] opcodeWord = Shorts.toByteArray(opcode[i]);
-                    if(EntryPoint.verbose)System.out.println(opcodeWord[0]);
+                    l.trace(opcodeWord[0]);
                     opcodeValues[i]=opcodeWord[0];
                     opcodeReal=(opcodeWord[1]); //stompy stomp, only keeps the last
                 }
                 String rawValue = Utils.bytesToHex(opcodeValues);
-                if(EntryPoint.verbose)System.out.println(rawValue);
+                l.trace(rawValue);
 
                 int valueUnsigned = XAPDisAsmGeneratedCode.unsignedCounts.get(rawValue);
                 int valueSigned =XAPDisAsmGeneratedCode.signedCounts.get(rawValue);
@@ -158,7 +160,7 @@ public class XAPDisAsm {
                     opcodeReal=(opcodeWord[1]); //stompy stomp, only keeps the last
                 }
                 String rawVal = Utils.bytesToHex(opcodeValues);
-                if(EntryPoint.verbose)System.out.println(rawVal);
+                l.trace(rawVal);
                 int valueUnsigned = XAPDisAsmGeneratedCode.unsignedCounts.get(rawVal);
                 int valueSigned =XAPDisAsmGeneratedCode.signedCounts.get(Utils.bytesToHex(opcodeValues));
                 String register = "";
@@ -834,15 +836,15 @@ public class XAPDisAsm {
     private static int untwiddleOpcodeParamBra(byte[] opcode,int opcodelocation)
     {
         int out = opcode[0];
-        if(EntryPoint.verbose)System.out.println(out);
-        if(EntryPoint.verbose)System.out.println(String.format("0x%08X", out));
+        l.trace(out);
+        l.trace(String.format("0x%08X", out));
         for(int i=1;i<opcode.length;i++)
         {
             out=out<<8;
             out+=opcode[i];
-            if(EntryPoint.verbose)System.out.println(out);
-            if(EntryPoint.verbose)System.out.println(opcode[i]);
-            if(EntryPoint.verbose)System.out.println(String.format("0x%08X", out));
+            l.trace(out);
+            l.trace(opcode[i]);
+            l.trace(String.format("0x%08X", out));
         }
         out=out+opcodelocation;
         out = out &0x00FFFFFF;
@@ -939,9 +941,9 @@ public class XAPDisAsm {
             for(int i=0;i<assemblyLength;i++)
             {
                 Short word = f.readShort();
-                if(EntryPoint.verbose)System.out.println("READ:"+ (word&0xff));
-                if(EntryPoint.verbose)System.out.println(addressToString(i));
-                if(EntryPoint.verbose)System.out.println(addressToString(baseAddressLastOpcode));
+                l.trace("READ:"+ (word&0xff));
+                l.trace(addressToString(i));
+                l.trace(addressToString(baseAddressLastOpcode));
                 opcodeHoldingBay.add(word);
                 if(word==(short)0xfe09) //specialcasing one specific opcode
                 {
@@ -972,13 +974,13 @@ public class XAPDisAsm {
                                 opcode[j]=opcodeHoldingBay.get(j);
                             }
                         }
-                        if(EntryPoint.verbose)System.out.println("Mangling Opcode with length"+opcode.length);
+                        l.trace("Mangling Opcode with length"+opcode.length);
                         try{
                             disassembled.println(manglers[word&0xff].mangleOpCode(modifier,opcode,baseAddressLastOpcode));
                         }
                         catch(Exception e)
                         {
-                            System.err.println(invalid.mangleOpCode(modifier,opcode,baseAddressLastOpcode));
+                            l.info(invalid.mangleOpCode(modifier,opcode,baseAddressLastOpcode));
                             disassembled.println(invalid.mangleOpCode(modifier,opcode,baseAddressLastOpcode));
                             //System.exit(-1);
                         }
@@ -995,7 +997,7 @@ public class XAPDisAsm {
                         opcodeHoldingBay.clear();
                         baseAddressLastOpcode++;
                     }
-                    if(EntryPoint.verbose)System.out.println("VALUE");
+                    l.trace("VALUE");
                     //opcodeHoldingBay.add(word);
                 }
 

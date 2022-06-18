@@ -1,5 +1,7 @@
 package de.nplusc.izc.senabitwiggler;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.yaml.snakeyaml.Yaml;
 
 import javax.sound.midi.Patch;
@@ -15,19 +17,21 @@ import java.util.*;
 import static de.nplusc.izc.senabitwiggler.Utils.runTool;
 
 public class PromptHandlerSuite {
+
+    private static final Logger l = LogManager.getLogger();
     public static void handlePrompts(File firmware, File outfolder, String headsetid,boolean deep) throws InputInvalidException {
         String devicefile = EntryPoint.APPDIR+File.separator+"devices"+File.separator+headsetid+".device.yml";
         if(!(new File(devicefile).exists()))
         {
             File f =  new File(EntryPoint.APPDIR+File.separator+"devices");
-            System.out.println("Invalid Headset reference: Valid values are");
+            l.error("Invalid Headset reference: Valid values are");
             try {
                 Files.walk(f.toPath(), 1).forEach(p ->
                 {
                     String fn = p.getFileName().toString();
                     if(fn.endsWith(".device.yml"))
                     {
-                        System.out.println(fn.replace(".device.yml",""));
+                        l.error(fn.replace(".device.yml",""));
                     }
                 });
             } catch (IOException e) {
@@ -133,14 +137,14 @@ public class PromptHandlerSuite {
             if(!(new File(devicefile).exists()))
             {
                 File f =  new File(EntryPoint.APPDIR+File.separator+"devices");
-                System.out.println("Invalid Headset reference: Valid values are");
+                l.error("Invalid Headset reference: Valid values are");
                 try {
                     Files.walk(f.toPath(), 1).forEach(p ->
                     {
                         String fn = p.getFileName().toString();
                         if(fn.endsWith(".device.yml"))
                         {
-                            System.out.println(fn.replace(".device.yml",""));
+                            l.error(fn.replace(".device.yml",""));
                         }
                     });
                 } catch (IOException e) {

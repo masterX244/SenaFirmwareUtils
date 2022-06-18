@@ -4,6 +4,46 @@ public class Configuration {
     private String BlueLabPath;
     private String SoxPath;
 
+    private boolean MatrixEnabled = false;
+
+    private String MatrixUser;
+
+    private String MatrixPassword;
+
+    private String MatrixDomain;
+
+    public String getMatrixDomain() {
+        return MatrixDomain;
+    }
+
+    public void setMatrixDomain(String matrixDomain) {
+        MatrixDomain = matrixDomain;
+    }
+
+    public boolean isMatrixEnabled() {
+        return MatrixEnabled;
+    }
+
+    public String getMatrixPassword() {
+        return MatrixPassword;
+    }
+
+    public String getMatrixUser() {
+        return MatrixUser;
+    }
+
+    public void setMatrixEnabled(boolean matrixEnabled) {
+        MatrixEnabled = matrixEnabled;
+    }
+
+    public void setMatrixPassword(String matrixPassword) {
+        MatrixPassword = matrixPassword;
+    }
+
+    public void setMatrixUser(String matrixUser) {
+        MatrixUser = matrixUser;
+    }
+
     public String getBlueLabPath() {
         return BlueLabPath;
     }

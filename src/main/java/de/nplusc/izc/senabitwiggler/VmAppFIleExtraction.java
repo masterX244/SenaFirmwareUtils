@@ -3,11 +3,14 @@ package de.nplusc.izc.senabitwiggler;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.Shorts;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
 
 public class VmAppFIleExtraction {
+    private static final Logger l = LogManager.getLogger();
     public static void extractVmImage(File input, String output)
     {
         byte filler = 0x00;
@@ -17,7 +20,7 @@ public class VmAppFIleExtraction {
             long len = f.length()/2;
             if(len>Integer.MAX_VALUE)
             {
-                System.out.println("Ugggh, File too big");
+                l.error("Ugggh, File too big");
                 return;
             }
 
@@ -29,7 +32,7 @@ public class VmAppFIleExtraction {
             }
             if(Utils.xorsum(checksumarray)!=0)
             {
-                System.err.println("Smells like Dead Beef, the data seems to be corrupt");
+                l.error("Smells like Dead Beef, the data seems to be corrupt");
                 System.exit(1);
             }
             f.seek(0);
@@ -116,7 +119,7 @@ public class VmAppFIleExtraction {
             long len = f.length()/2;
             if(len>Integer.MAX_VALUE)
             {
-                System.out.println("Ugggh, File too big");
+                System.out.pri ntln("Ugggh, File too big");
                 return;
             }
 
@@ -128,7 +131,7 @@ public class VmAppFIleExtraction {
             }
             if(Utils.xorsum(checksumarray)!=0)
             {
-                System.err.println("Smells like Dead Beef, the data seems to be corrupt");
+                System.err.prin tln("Smells like Dead Beef, the data seems to be corrupt");
                 System.exit(1);
             }
             f.seek(0);

@@ -1,6 +1,6 @@
 defaultTasks 'distZip'
 
-apply plugin: 'java'
+apply plugin: 'java-library'
 apply plugin: 'application'
 
 
@@ -23,7 +23,18 @@ repositories{
 }
 
 dependencies{
-    compile "org.yaml:snakeyaml:1.14"
-    compile("com.google.guava:guava:31.0.1-jre")
-	compile( 'info.picocli:picocli:4.6.2')
+    api "org.yaml:snakeyaml:1.14"
+    api("com.google.guava:guava:31.0.1-jre")
+	api( 'info.picocli:picocli:4.6.2')
+	api('io.github.ma1uta.matrix:client-impl:+')
+	api group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.+'
+	api group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.+'
+	api group: 'org.apache.logging.log4j', name: 'log4j-iostreams', version: '2.+'
+	api group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.+'
+	api group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '2.+'
+
+
+	api('org.jboss.resteasy:resteasy-client-microprofile:4.6+')
+	api('org.jboss.resteasy:resteasy-jackson2-provider:4.6+')
+	api('javax.enterprise:cdi-api:1.2')
 }

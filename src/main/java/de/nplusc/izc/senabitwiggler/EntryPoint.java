@@ -2,6 +2,11 @@ package de.nplusc.izc.senabitwiggler;
 
 import java.io.*;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.yaml.snakeyaml.Yaml;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -11,6 +16,8 @@ import picocli.CommandLine.Parameters;
 @Command(mixinStandardHelpOptions = true, version = "Sena Firmware Hacking Utiility")
 public class EntryPoint implements Runnable
 {
+    private static final Logger l = LogManager.getLogger();
+
     @Parameters(index = "0", description = "Mode for the Program. Valid values: ${COMPLETION-CANDIDATES}")
     private Modes mode;
 
@@ -21,7 +28,7 @@ public class EntryPoint implements Runnable
     @Parameters(index = "2", description = "Disassembled Data Folder")
     private File output;
 
-    @Parameters(index = "3", arity = "0..1", description = "Headset ID. Any value if not in the Prompt unpacking mode")
+    @Parameters(index = "3", arity = "0..1", description = "Headset ID. Any value if not in the Prompt unpacking mode.")
     private String headset;
 
     @Option(names = { "-d", "--deep" }, description = "Deep Dissect. Splits everything down and reassembles from those low-level modules. Also yields a partial disassembly.")
@@ -33,6 +40,8 @@ public class EntryPoint implements Runnable
 
     public static String SoxPath = "";
     public static String BlueLabPath = "";
+
+    public static Configuration c;
 
     public static final String APPDIR = new File(EntryPoint.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getParent();
 
@@ -46,9 +55,10 @@ public class EntryPoint implements Runnable
                 Configuration config = y.loadAs(new FileReader(cfg),Configuration.class);
                 SoxPath=config.getSoxPath();
                 BlueLabPath=config.getBlueLabPath();
-            } catch (FileNotFoundException e) {
-                System.err.println("Hurz");
-                e.printStackTrace();
+                c=config;
+                y.dump(config, new FileWriter(cfg));
+            } catch (IOException e) {
+                l.catching(e);
             }
         }
         else
@@ -58,9 +68,9 @@ public class EntryPoint implements Runnable
             config.setSoxPath("sox");
             try {
                 y.dump(config, new FileWriter(cfg));
-                System.err.println("Configuration needed. Check the generated config.yml");
+                l.error("Configuration needed. Check the generated config.yml");
             } catch (IOException e) {
-                System.err.println("Failed to initialize config");
+                l.error("Failed to initialize config");
                 e.printStackTrace();
             }
             System.exit(0);
@@ -73,7 +83,22 @@ public class EntryPoint implements Runnable
 
     @Override
     public void run() {
-        //TODO check and init config file
+        System.setProperty("java.util.logging.manager", "org.apache.logging.log4j.jul.LogManager"); //HACK to catch java.util.logging loggers
+        LoggerContext cx = (LoggerContext) LogManager.getContext(false);
+        org.apache.logging.log4j.core.config.Configuration config = cx.getConfiguration();
+
+        LoggerConfig loggerConfig = config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME);
+
+        if (verbose)
+        {
+            loggerConfig.setLevel(Level.TRACE);
+        }
+        else
+        {
+            loggerConfig.setLevel(Level.INFO);
+        }
+
+
         switch(mode)
         {
             case ExtractSenaBin:
@@ -81,7 +106,7 @@ public class EntryPoint implements Runnable
                     Utils.makeSureThatOutFolderIsCreated(output.getPath());
                     FirmwareWrapperExtraction.extractFirmwareLong(input,output.getPath());
                 } catch (InputInvalidException e) {
-                    System.out.println("Zarf! File was bad");
+                    l.error("Zarf! File was bad");
                     e.printStackTrace();
                 }
                 break;
@@ -129,6 +154,9 @@ public class EntryPoint implements Runnable
             case DfuS512x:
                 FlashFSUnWiggler.unpackQCC512DFU(input,output);
                 break;
+            case ScanForSenaFirmware:
+                FirmwareAutoDumper.pullFirmwares(input,output,weNeedToGoDeeper);
+                break;
         }
     }
 }
@@ -147,7 +175,8 @@ enum Modes
     ResignDFU,
     FlashFS512x,
     FlashFSCSR86xx,
-    DfuS512x
+    DfuS512x,
+    ScanForSenaFirmware
 }
 
 // http://www.tinyosshop.com/download/ADK_CSR867x.WIN4.3.1.5.zip für die tools

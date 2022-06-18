@@ -2,6 +2,8 @@ package de.nplusc.izc.senabitwiggler;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Shorts;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -10,6 +12,7 @@ import java.io.RandomAccessFile;
 import java.util.Random;
 
 public class FlashFSUnWiggler {
+    private static final Logger l = LogManager.getLogger();
     private static class FileMetadata
     {
         private int offset;
@@ -30,8 +33,8 @@ public class FlashFSUnWiggler {
             if(sizeFile>f.length())
             {
 
-                System.out.println(sizeFile);
-                System.err.println("ZOINKS!!!, mismatch");
+                l.info(sizeFile);
+                l.info("ZOINKS!!!, mismatch");
                 return;
             }
             f.read(javaisDipshit);
@@ -43,13 +46,13 @@ public class FlashFSUnWiggler {
                 f.read(javaisDipshit);
                 int sizeAndFlags = Ints.fromBytes(javaisDipshit[3],javaisDipshit[2],javaisDipshit[1],javaisDipshit[0]);
                 int size = sizeAndFlags&0x00FFFFFF;
-                System.out.println(sizeAndFlags);
-                System.out.println(size);
+                l.info(sizeAndFlags);
+                l.info(size);
 
                 fmd.offset_fname=size;
                 if((sizeAndFlags&0xFF000000)<0)
                 {
-                    System.out.println("dir");
+                    l.info("dir");
                     fmd.is_dir=true;
                 }
                 f.read(javaisDipshit);
@@ -89,7 +92,7 @@ public class FlashFSUnWiggler {
                 else
                 {
 
-                    System.out.println("Reading:"+fmd.parentpath+fmd.filename+"("+fmd.length+")@"+fmd.offset);
+                    l.info("Reading:"+fmd.parentpath+fmd.filename+"("+fmd.length+")@"+fmd.offset);
                     byte[] filecontent = new byte[fmd.length];
                     if(fmd.length>0)
                     {
@@ -128,8 +131,8 @@ public class FlashFSUnWiggler {
             if((sizeFile*2)>f.length())
             {
 
-                System.out.println(sizeFile);
-                System.err.println("ZOINKS!!!, mismatch");
+                l.info(sizeFile);
+                l.info("ZOINKS!!!, mismatch");
                 return;
             }
             byte[] background = new byte[(int)f.length()];
@@ -147,9 +150,9 @@ public class FlashFSUnWiggler {
 
             f.read(javaisDipshit);
             int countFileRecords = (Ints.fromBytes(javaisDipshit[2],javaisDipshit[3],javaisDipshit[0],javaisDipshit[1]) &0x00FFFFFF);
-            System.out.println(countFileRecords);
+            l.info(countFileRecords);
             int countFileRecordsXXX = (Ints.fromBytes(javaisDipshit[1],javaisDipshit[0],javaisDipshit[3],javaisDipshit[2])&0x00FFFFFF);
-            System.out.println(countFileRecordsXXX);
+            l.info(countFileRecordsXXX);
             boobs.write(fillershort);
             boobs.seek(10);
             f.seek(10);
@@ -165,13 +168,13 @@ public class FlashFSUnWiggler {
                 f.read(javaisDipshit);
                 int sizeAndFlags = Ints.fromBytes(javaisDipshit[0],javaisDipshit[1],javaisDipshit[2],javaisDipshit[3]);
                 int size = sizeAndFlags&0x00FFFFFF;
-                System.out.println("SZFlg>>"+sizeAndFlags);
-                System.out.println("SZExtr>>"+size);
+                l.info("SZFlg>>"+sizeAndFlags);
+                l.info("SZExtr>>"+size);
 
                 fmd.offset_fname=size;
                 if((sizeAndFlags&0xFF000000)<0)
                 {
-                    System.out.println("dir");
+                    l.info("dir");
                     fmd.is_dir=true;
                 }
                 f.read(javaisDipshit);
@@ -220,7 +223,7 @@ public class FlashFSUnWiggler {
                         int subfiles = fmd.offset+j-1;
                         if(subfiles==-1)
                         {
-                            System.out.println("WTF?");
+                            l.info("WTF?");
                         }
                         files[subfiles].parentpath=fmd.parentpath+fmd.filename;
                     }
@@ -228,7 +231,7 @@ public class FlashFSUnWiggler {
                 else
                 {
 
-                    System.out.println("Reading:"+fmd.parentpath+fmd.filename+"("+fmd.length+")@"+fmd.offset);
+                    l.info("Reading:"+fmd.parentpath+fmd.filename+"("+fmd.length+")@"+fmd.offset);
                     byte[] filecontent = new byte[fmd.length];
                     if(fmd.length>0)
                     {
@@ -262,7 +265,7 @@ public class FlashFSUnWiggler {
 
     public static void unpackQCC512DFU(File firmware, File outfolder)
     {
-        System.out.println("0x00!");
+        l.info("0x00!");
         try (RandomAccessFile f = new RandomAccessFile(firmware,"r"))
         {
             outfolder.mkdirs();
@@ -276,16 +279,16 @@ public class FlashFSUnWiggler {
             {
                 if(f.readInt() != 1346458196)
                 {
-                    System.out.println("Zarf!");
+                    l.info("Zarf!");
                     break; //end of file
                 }
                 if(f.readInt() != 1145132097)
                 {
-                    System.out.println("Zarf2!");
+                    l.info("Zarf2!");
                     break; //end of file
                 }
                 int sizeData = f.readInt();
-                System.out.println("Reading" +sizeData);
+                l.info("Reading" +sizeData);
                 byte[] innerFile = new byte[sizeData];
                 f.read(innerFile);
                 RandomAccessFile fo = new RandomAccessFile(new File(outfolder,i+".dat"),"rw");
