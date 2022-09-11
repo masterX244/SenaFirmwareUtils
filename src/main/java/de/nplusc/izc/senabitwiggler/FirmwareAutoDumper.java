@@ -130,6 +130,7 @@ public class FirmwareAutoDumper
                     Firmware f = state.getFirmwares().get(FWBAsename);
 
                     try {
+                        l.info("Processing line:"+line+"\n Basename:"+FWBAsename);
                         int[] fwnumber = splitVersionAndPullFW(FWFileName,f.getVersions(),deepmode);
                         f.setMajor(fwnumber[0]);
                         f.setMinor(fwnumber[1]);
@@ -293,10 +294,17 @@ public class FirmwareAutoDumper
     private static int[] splitVersionAndPullFW(String filename,HashMap<String,FirmwareVersion> knownVersions, boolean deepmode) throws IOException {
         String[] magic = filename.split("-v");
         boolean fuckingoddity = false;
+        boolean hackfix50R_SR = false;
         if(magic.length==1)
         {
             fuckingoddity = true;
             magic = filename.split("_v");
+            if(magic.length==1)
+            {
+                hackfix50R_SR = true;
+                magic = filename.split("SRv");
+
+            }
         }
         String version = magic[1];
         String[] vsplit = version.split("\\.");
@@ -332,6 +340,10 @@ public class FirmwareAutoDumper
         }
 
         String prefix = magic[0]+(fuckingoddity?"_":"-")+"v";
+        if(hackfix50R_SR)
+        {
+            prefix = magic[0]+"SRv";
+        }
         //suffix = suffix+".img";
 
         scanDownwards(major,minor,patch,prefix,suffix,knownVersions);
