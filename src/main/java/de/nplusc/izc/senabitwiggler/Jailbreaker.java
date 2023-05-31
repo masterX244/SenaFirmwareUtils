@@ -52,10 +52,17 @@ public class Jailbreaker {
         try {
             Utils.runTool(scratch,dfuunbuild,"-v","-f",dfuinput,"-o","extracted");
             Utils.runTool(scratch,dfusign,"-v", "-o","extracted0000signed.fs","-h","extracted0000.fs", "-ka",EntryPoint.APPDIR+File.separator+"jailbreak"+File.separator+"jailbreak.private.key");
+            Utils.runTool(scratch,dfusign,"-v", "-o","extracted0000signed.psr","-pa","extracted0000.psr", "-ka",EntryPoint.APPDIR+File.separator+"jailbreak"+File.separator+"jailbreak.private.key");
             File oldfs = new File(scratch,"extracted0000.fs");
             oldfs.delete();
             File newfs = new File(scratch,"extracted0000signed.fs");
             newfs.renameTo(oldfs);
+
+            oldfs = new File(scratch,"extracted0000.psr");
+            oldfs.delete();
+            newfs = new File(scratch,"extracted0000signed.psr.app.psr");
+            newfs.renameTo(oldfs);
+
             Utils.runTool(scratch,dfubuild,"-c","extracted.cl","-f",dfuout);
         } catch (IOException e) {
             e.printStackTrace();

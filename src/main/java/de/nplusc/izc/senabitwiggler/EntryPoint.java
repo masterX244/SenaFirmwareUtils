@@ -154,6 +154,9 @@ public class EntryPoint implements Runnable
             case DfuS512x:
                 FlashFSUnWiggler.unpackQCC512DFU(input,output);
                 break;
+            case WriteDfuS512x:
+                FlashFSUnWiggler.repackQualcommWrapper(input,output);
+                break;
             case ScanForSenaFirmware:
                 FirmwareAutoDumper.pullFirmwares(input,output,weNeedToGoDeeper);
                 break;
@@ -176,6 +179,7 @@ enum Modes
     FlashFS512x,
     FlashFSCSR86xx,
     DfuS512x,
+    WriteDfuS512x,
     ScanForSenaFirmware
 }
 

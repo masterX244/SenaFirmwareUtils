@@ -7,6 +7,8 @@ public class Firmware {
     private HashMap<String, FirmwareVersion> versions;
     private boolean InitialDLDone;
 
+    private boolean IAItemCreated = false;
+
     private int major;
     private int minor;
     private int patch;
@@ -67,5 +69,13 @@ public class Firmware {
 
     public void setDeviceId(String deviceId) {
         DeviceId = deviceId;
+    }
+
+    public boolean isIAItemCreated() {
+        return IAItemCreated;
+    }
+
+    public void setIAItemCreated(boolean IAItemCreated) {
+        this.IAItemCreated = IAItemCreated;
     }
 }

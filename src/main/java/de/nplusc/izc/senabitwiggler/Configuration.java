@@ -12,6 +12,8 @@ public class Configuration {
 
     private String MatrixDomain;
 
+    private String ArchiveOrgCollection;
+
     public String getMatrixDomain() {
         return MatrixDomain;
     }
@@ -58,5 +60,13 @@ public class Configuration {
 
     public void setSoxPath(String soxPath) {
         SoxPath = soxPath;
+    }
+
+    public String getArchiveOrgCollection() {
+        return ArchiveOrgCollection;
+    }
+
+    public void setArchiveOrgCollection(String archiveOrgCollection) {
+        ArchiveOrgCollection = archiveOrgCollection;
     }
 }

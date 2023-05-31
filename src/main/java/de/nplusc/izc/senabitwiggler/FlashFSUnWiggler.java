@@ -2,13 +2,15 @@ package de.nplusc.izc.senabitwiggler;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Shorts;
+import de.nplusc.izc.senabitwiggler.DataStructures.QualCommHeaderRecord;
+import de.nplusc.izc.senabitwiggler.DataStructures.QualCommWrapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class FlashFSUnWiggler {
@@ -265,18 +267,23 @@ public class FlashFSUnWiggler {
 
     public static void unpackQCC512DFU(File firmware, File outfolder)
     {
+        QualCommWrapper w = new QualCommWrapper();
         l.info("0x00!");
         try (RandomAccessFile f = new RandomAccessFile(firmware,"r"))
         {
             outfolder.mkdirs();
             f.read(new byte[8]); //skip header
             int hdrsize = f.readInt();
-            f.read(new byte[hdrsize]);
+            byte[] header = new byte[hdrsize];
+            f.read(header);
+            w.header=header;
             // 1346458196
             // 1145132097
             int i = 0;
+            List<QualCommHeaderRecord> files = new ArrayList<>();
             while(true)
             {
+                QualCommHeaderRecord r = new QualCommHeaderRecord();
                 if(f.readInt() != 1346458196)
                 {
                     l.info("Zarf!");
@@ -288,20 +295,93 @@ public class FlashFSUnWiggler {
                     break; //end of file
                 }
                 int sizeData = f.readInt();
+                r.size = sizeData;
                 l.info("Reading" +sizeData);
-                byte[] innerFile = new byte[sizeData];
+                short location = f.readShort();
+                short sublocation = f.readShort();
+                r.location=location;
+                r.sublocation=sublocation;
+                String filename = location+"_"+sublocation+".dat";
+                r.filename=filename;
+                byte[] innerFile = new byte[sizeData-4];
+
                 f.read(innerFile);
-                RandomAccessFile fo = new RandomAccessFile(new File(outfolder,i+".dat"),"rw");
+                RandomAccessFile fo = new RandomAccessFile(new File(outfolder,filename),"rw");
                 fo.write(innerFile);
                 fo.close();
                 i++;
+                files.add(r);
             }
+            int bytesLeft = 4+((int)(f.length()-f.getFilePointer()));
+            byte[] rest = new byte[bytesLeft];
+            f.seek(f.getFilePointer()-4);
+             f.read(rest);
+             w.footer=rest;
 
+            w.files = files.toArray(new QualCommHeaderRecord[files.size()]);
+            Yaml y = new Yaml();
+
+            y.dump(w, new FileWriter(new File(outfolder,"header.yml")));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
+
+    public static void repackQualcommWrapper(File newfirmware, File inputfolder)
+    {
+        QualCommWrapper header;
+        try {
+             header = new Yaml().loadAs(new FileReader(new File(inputfolder,File.separator+"header.yml")),QualCommWrapper.class);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return;
+        }
+        l.info("0x00!");
+
+        if(newfirmware.exists())
+        {
+            l.error("Refusing to overwrite a existing file!!!");
+            return;
+        }
+
+        try (RandomAccessFile f = new RandomAccessFile(newfirmware,"rw"))
+        {
+            f.writeInt(0x41505055);
+            f.writeInt(0x48445232);
+            f.writeInt(header.header.length);
+            f.write(header.header);
+
+            // 1346458196
+            // 1145132097
+
+            for(QualCommHeaderRecord r:header.files)
+            {
+                RandomAccessFile f2 = new RandomAccessFile(new File(inputfolder,r.filename),"r");
+                int size = (int) f2.length();
+                byte[] file = new byte[size];
+                f2.read(file);
+                f.writeInt(1346458196);
+                f.writeInt(1145132097);
+                f.writeInt(size+4);
+                f.writeShort(r.location);
+                f.writeShort(r.sublocation);
+                f.write(file);
+                f2.close();
+            }
+            f.write(header.footer);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
+
+
+
 }

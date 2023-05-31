@@ -10,6 +10,26 @@ public class FirmwareVersion {
     private int patch;
     private boolean hidden;
 
+    private boolean rc_hackfix;
+
+    private boolean alternativeLocation;
+
+    private String FirmwareLocation = "main";
+
+    private String hackfix = "";
+
+    private String susVersion = "";
+
+    private boolean IAUploaded = false;
+
+    public String getSusVersion() {
+        return susVersion;
+    }
+
+    public void setSusVersion(String susVersion) {
+        this.susVersion = susVersion;
+    }
+
     private MatrixState NotificationState = MatrixState.TODO;
 
     public MatrixState getNotificationState() {
@@ -77,5 +97,45 @@ public class FirmwareVersion {
 
     public void setHidden(boolean hidden) {
         this.hidden = hidden;
+    }
+
+    public String getHackfix() {
+        return hackfix;
+    }
+
+    public void setHackfix(String hackfix) {
+        this.hackfix = hackfix;
+    }
+
+    public boolean isRc_hackfix() {
+        return rc_hackfix;
+    }
+
+    public void setRc_hackfix(boolean rc_hackfix) {
+        this.rc_hackfix = rc_hackfix;
+    }
+
+    public boolean isAlternativeLocation() {
+        return alternativeLocation;
+    }
+
+    public void setAlternativeLocation(boolean alternativeLocation) {
+        this.alternativeLocation = alternativeLocation;
+    }
+
+    public String getFirmwareLocation() {
+        return FirmwareLocation;
+    }
+
+    public void setFirmwareLocation(String firmwareLocation) {
+        FirmwareLocation = firmwareLocation;
+    }
+
+    public boolean isIAUploaded() {
+        return IAUploaded;
+    }
+
+    public void setIAUploaded(boolean IAUploaded) {
+        this.IAUploaded = IAUploaded;
     }
 }
